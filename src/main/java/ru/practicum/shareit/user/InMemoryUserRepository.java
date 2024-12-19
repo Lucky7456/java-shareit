@@ -5,6 +5,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 @Repository
 public class InMemoryUserRepository implements UserRepository {
@@ -25,6 +26,9 @@ public class InMemoryUserRepository implements UserRepository {
     @Override
     public User update(long userId, User user) {
         User userToUpdate = users.get(userId);
+        if (userToUpdate == null) {
+            throw new NoSuchElementException("user with id = " + userId + " not found");
+        }
         if (user.getName() != null && !user.getName().isBlank()) {
             userToUpdate.setName(user.getName());
         }

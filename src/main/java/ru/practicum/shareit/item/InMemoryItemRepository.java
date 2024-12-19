@@ -5,6 +5,7 @@ import org.springframework.stereotype.Repository;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 @Repository
 public class InMemoryItemRepository implements ItemRepository {
@@ -32,6 +33,9 @@ public class InMemoryItemRepository implements ItemRepository {
     @Override
     public Item update(long itemId, Item item) {
         Item itemToUpdate = items.get(itemId);
+        if (itemToUpdate == null) {
+            throw new NoSuchElementException("item with id = " + itemId + " not found");
+        }
         if (item.getName() != null && !item.getName().isBlank()) {
             itemToUpdate.setName(item.getName());
         }
