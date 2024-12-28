@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exception.ForbiddenException;
 import ru.practicum.shareit.item.Item;
 import ru.practicum.shareit.item.ItemRepository;
+import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserRepository;
 
 import java.time.LocalDateTime;
@@ -24,11 +25,12 @@ public class BookingServiceImpl implements BookingService {
     @Override
     @Transactional
     public BookingDto create(long userId, BookingCreateRequestDto bookingDto) {
+        User user = userRepository.findById(userId).orElseThrow();
         Item item = itemRepository.findById(bookingDto.getItemId()).orElseThrow();
         if (!item.getAvailable()) {
-            throw new ValidationException("item unavailable for booking");
+            throw new BookingValidationException("item unavailable for booking");
         }
-        Booking booking = BookingMapper.toBooking(bookingDto, userRepository.findById(userId).orElseThrow(), item);
+        Booking booking = BookingMapper.toBooking(bookingDto, user, item);
         return BookingMapper.toBookingDto(bookingRepository.save(booking));
     }
 
@@ -54,12 +56,14 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public List<BookingDto> findAllBookingsByBookerId(long bookerId, BookingState state) {
+        userRepository.findById(bookerId).orElseThrow();
         BooleanExpression byBookerAndState = QBooking.booking.booker.id.eq(bookerId).and(byState(state));
         return BookingMapper.toBookingDto(bookingRepository.findAll(byBookerAndState, QBooking.booking.start.desc()));
     }
 
     @Override
     public List<BookingDto> findAllBookingsByOwnerId(long ownerId, BookingState state) {
+        userRepository.findById(ownerId).orElseThrow();
         BooleanExpression byOwnerAndState = QBooking.booking.item.owner.id.eq(ownerId).and(byState(state));
         return BookingMapper.toBookingDto(bookingRepository.findAll(byOwnerAndState, QBooking.booking.start.desc()));
     }

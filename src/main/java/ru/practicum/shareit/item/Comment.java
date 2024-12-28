@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 @ToString
 @EqualsAndHashCode(of = {"id"})
 @AllArgsConstructor
+@NoArgsConstructor
 public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

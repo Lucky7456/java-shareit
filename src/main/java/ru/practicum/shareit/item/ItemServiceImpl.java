@@ -3,10 +3,7 @@ package ru.practicum.shareit.item;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.practicum.shareit.booking.Booking;
-import ru.practicum.shareit.booking.BookingRepository;
-import ru.practicum.shareit.booking.BookingStatus;
-import ru.practicum.shareit.booking.QBooking;
+import ru.practicum.shareit.booking.*;
 import ru.practicum.shareit.exception.ForbiddenException;
 import ru.practicum.shareit.user.UserRepository;
 
@@ -83,7 +80,7 @@ public class ItemServiceImpl implements ItemService {
     @Transactional
     public CommentDto createComment(long bookerId, long itemId, CommentDto commentDto) {
         Booking booking = bookingRepository.findOneByBookerIdAndItemIdAndStatusAndEndBefore(bookerId, itemId,
-                BookingStatus.APPROVED, LocalDateTime.now()).orElseThrow();
+                BookingStatus.APPROVED, LocalDateTime.now()).orElseThrow(() -> new BookingValidationException(""));
         Comment comment = CommentMapper.toComment(booking.getBooker(), booking.getItem(), commentDto);
         return CommentMapper.toDto(commentRepository.save(comment));
     }

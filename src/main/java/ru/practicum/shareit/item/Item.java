@@ -12,6 +12,7 @@ import ru.practicum.shareit.user.User;
 @ToString
 @EqualsAndHashCode(of = {"id"})
 @AllArgsConstructor
+@NoArgsConstructor
 public class Item {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

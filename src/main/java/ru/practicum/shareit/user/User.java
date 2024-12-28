@@ -10,6 +10,7 @@ import lombok.*;
 @ToString
 @EqualsAndHashCode(of = {"id"})
 @AllArgsConstructor
+@NoArgsConstructor
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

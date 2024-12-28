@@ -17,7 +17,7 @@ public class BookingController {
     public BookingDto create(@RequestHeader("X-Sharer-User-Id") long userId,
                              @Valid @RequestBody BookingCreateRequestDto bookingDto) {
         if (bookingDto.getStart().equals(bookingDto.getEnd())) {
-            throw new ValidationException("start date can't be equal to end date");
+            throw new BookingValidationException("start date can't be equal to end date");
         }
         return bookingService.create(userId, bookingDto);
     }
