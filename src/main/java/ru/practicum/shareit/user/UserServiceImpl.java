@@ -18,7 +18,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto update(long userId, UserDto user) {
-        if (!userRepository.existsByEmailIgnoreCase(user.getEmail())) {
+        if (userRepository.existsByEmailIgnoreCase(user.getEmail())) {
             throw new ValidationException("email " + user.getEmail() + " already exists");
         }
         User updatedUser = UserMapper.updateUser(userRepository.findById(userId).orElseThrow(), user);

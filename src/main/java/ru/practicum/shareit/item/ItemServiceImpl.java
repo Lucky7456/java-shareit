@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.Booking;
 import ru.practicum.shareit.booking.BookingRepository;
+import ru.practicum.shareit.booking.BookingStatus;
 import ru.practicum.shareit.booking.QBooking;
 import ru.practicum.shareit.exception.ForbiddenException;
 import ru.practicum.shareit.user.UserRepository;
@@ -21,6 +22,7 @@ public class ItemServiceImpl implements ItemService {
     private final UserRepository userRepository;
     private final ItemRepository itemRepository;
     private final BookingRepository bookingRepository;
+    private final CommentRepository commentRepository;
 
     @Override
     public List<ItemOwnerDto> findAllByOwnerId(long ownerId) {
@@ -36,7 +38,8 @@ public class ItemServiceImpl implements ItemService {
                     return ItemMapper.mapToItemOwnerDto(
                             i,
                             lastBooking != null ? lastBooking.getStart() : null,
-                            nextBooking != null ? nextBooking.getStart() : null
+                            nextBooking != null ? nextBooking.getStart() : null,
+                            commentRepository.findByItemId(i.getId()).stream().map(CommentMapper::toDto).toList()
                     );
                 })
                 .toList();
@@ -53,8 +56,9 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public ItemDto getItemById(long itemId) {
-        return ItemMapper.mapToItemDto(itemRepository.findById(itemId).orElseThrow());
+    public ItemOwnerDto getItemById(long itemId) {
+        return ItemMapper.mapToItemOwnerDto(itemRepository.findById(itemId).orElseThrow(), null,
+                null, commentRepository.findByItemId(itemId).stream().map(CommentMapper::toDto).toList());
     }
 
     @Override
@@ -73,5 +77,14 @@ public class ItemServiceImpl implements ItemService {
         }
         Item updatedItem = ItemMapper.updateItem(item, itemDto);
         return ItemMapper.mapToItemDto(itemRepository.save(updatedItem));
+    }
+
+    @Override
+    @Transactional
+    public CommentDto createComment(long bookerId, long itemId, CommentDto commentDto) {
+        Booking booking = bookingRepository.findOneByBookerIdAndItemIdAndStatusAndEndBefore(bookerId, itemId,
+                BookingStatus.APPROVED, LocalDateTime.now()).orElseThrow();
+        Comment comment = CommentMapper.toComment(booking.getBooker(), booking.getItem(), commentDto);
+        return CommentMapper.toDto(commentRepository.save(comment));
     }
 }
