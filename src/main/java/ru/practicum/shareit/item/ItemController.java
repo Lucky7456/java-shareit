@@ -31,8 +31,8 @@ public class ItemController {
     }
 
     @GetMapping
-    public List<ItemDto> findAllUserItems(@RequestHeader("X-Sharer-User-Id") long userId) {
-        return service.findAllUserItems(userId);
+    public List<ItemOwnerDto> findAllByOwnerId(@RequestHeader("X-Sharer-User-Id") long ownerId) {
+        return service.findAllByOwnerId(ownerId);
     }
 
     @GetMapping("/search")

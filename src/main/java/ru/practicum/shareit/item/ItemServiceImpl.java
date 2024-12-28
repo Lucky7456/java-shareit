@@ -3,11 +3,16 @@ package ru.practicum.shareit.item;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.shareit.booking.Booking;
+import ru.practicum.shareit.booking.BookingRepository;
+import ru.practicum.shareit.booking.QBooking;
 import ru.practicum.shareit.exception.ForbiddenException;
 import ru.practicum.shareit.user.UserRepository;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.StreamSupport;
 
 @Service
 @RequiredArgsConstructor
@@ -15,11 +20,25 @@ import java.util.List;
 public class ItemServiceImpl implements ItemService {
     private final UserRepository userRepository;
     private final ItemRepository itemRepository;
+    private final BookingRepository bookingRepository;
 
     @Override
-    public List<ItemDto> findAllUserItems(long userId) {
-        return itemRepository.findAllByOwnerId(userId).stream()
-                .map(ItemMapper::mapToItemDto)
+    public List<ItemOwnerDto> findAllByOwnerId(long ownerId) {
+        Iterable<Booking> bookings = bookingRepository.findAll(QBooking.booking.item.owner.id.eq(ownerId), QBooking.booking.start.desc());
+        return itemRepository.findAllByOwnerId(ownerId).stream()
+                .map(i -> {
+                    List<Booking> itemBookings = StreamSupport.stream(bookings.spliterator(),false)
+                            .filter(b -> b.getItem().getId() == i.getId()).toList();
+                    Booking lastBooking = itemBookings.stream()
+                            .filter(b -> b.getStart().isBefore(LocalDateTime.now())).findFirst().orElse(null);
+                    Booking nextBooking = itemBookings.reversed().stream()
+                            .filter(b -> b.getStart().isAfter(LocalDateTime.now())).findFirst().orElse(null);
+                    return ItemMapper.mapToItemOwnerDto(
+                            i,
+                            lastBooking != null ? lastBooking.getStart() : null,
+                            nextBooking != null ? nextBooking.getStart() : null
+                    );
+                })
                 .toList();
     }
 

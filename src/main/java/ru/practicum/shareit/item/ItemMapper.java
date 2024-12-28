@@ -4,6 +4,8 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import ru.practicum.shareit.user.User;
 
+import java.time.LocalDateTime;
+
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ItemMapper {
     public static ItemDto mapToItemDto(Item item) {
@@ -37,5 +39,17 @@ public final class ItemMapper {
             item.setAvailable(itemDto.getAvailable());
         }
         return item;
+    }
+
+    public static ItemOwnerDto mapToItemOwnerDto(Item item, LocalDateTime lastBooking, LocalDateTime nextBooking) {
+        return new ItemOwnerDto(
+                item.getId(),
+                item.getOwner().getId(),
+                item.getName(),
+                item.getDescription(),
+                item.getAvailable(),
+                lastBooking,
+                nextBooking
+        );
     }
 }

@@ -9,7 +9,7 @@ public interface ItemService {
 
     ItemDto getItemById(long itemId);
 
-    List<ItemDto> findAllUserItems(long userId);
+    List<ItemOwnerDto> findAllByOwnerId(long ownerId);
 
     List<ItemDto> searchItemsBy(String text);
 }
