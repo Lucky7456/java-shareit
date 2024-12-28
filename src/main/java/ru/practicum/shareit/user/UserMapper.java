@@ -20,4 +20,14 @@ public final class UserMapper {
                 userDto.getEmail()
         );
     }
+
+    public static User updateUser(User user, UserDto userDto) {
+        if (userDto.getName() != null && !userDto.getName().isBlank()) {
+            user.setName(userDto.getName());
+        }
+        if (userDto.getEmail() != null && !userDto.getEmail().isBlank()) {
+            user.setEmail(userDto.getEmail());
+        }
+        return user;
+    }
 }
