@@ -26,7 +26,7 @@ public class ItemServiceImpl implements ItemService {
         Iterable<Booking> bookings = bookingRepository.findAll(QBooking.booking.item.owner.id.eq(ownerId), QBooking.booking.start.desc());
         return itemRepository.findAllByOwnerId(ownerId).stream()
                 .map(i -> {
-                    List<Booking> itemBookings = StreamSupport.stream(bookings.spliterator(),false)
+                    List<Booking> itemBookings = StreamSupport.stream(bookings.spliterator(), false)
                             .filter(b -> b.getItem().getId() == i.getId()).toList();
                     Booking lastBooking = itemBookings.stream()
                             .filter(b -> b.getStart().isBefore(LocalDateTime.now())).findFirst().orElse(null);
