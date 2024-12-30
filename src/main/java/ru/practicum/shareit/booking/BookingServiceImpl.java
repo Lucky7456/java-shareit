@@ -36,8 +36,11 @@ public class BookingServiceImpl implements BookingService {
     @Override
     @Transactional
     public BookingDto approve(long userId, long bookingId, boolean approved) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new ForbiddenException("insufficient authority"));
         Booking booking = bookingRepository.findById(bookingId).orElseThrow();
-        if (booking.getItem().getOwner().getId() != userId || booking.getStatus() != BookingStatus.WAITING) {
+        Item bookedItem = booking.getItem();
+        User bookedItemOwner = bookedItem.getOwner();
+        if (user.getId() != bookedItemOwner.getId() || booking.getStatus() != BookingStatus.WAITING) {
             throw new ForbiddenException("insufficient authority");
         }
         booking.setStatus(approved ? BookingStatus.APPROVED : BookingStatus.REJECTED);
