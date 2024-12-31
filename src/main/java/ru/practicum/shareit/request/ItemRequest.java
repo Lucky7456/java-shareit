@@ -1,13 +1,10 @@
 package ru.practicum.shareit.request;
 
 import jakarta.persistence.*;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import ru.practicum.shareit.user.User;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "requests")
@@ -15,6 +12,8 @@ import java.time.Instant;
 @Setter
 @ToString
 @EqualsAndHashCode(of = {"id"})
+@AllArgsConstructor
+@NoArgsConstructor
 public class ItemRequest {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,11 +22,11 @@ public class ItemRequest {
     @Column
     private String description;
 
-    @OneToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "requester_id")
     @ToString.Exclude
     private User requester;
 
     @Column
-    private Instant created = Instant.now();
+    private LocalDateTime created = LocalDateTime.now();
 }

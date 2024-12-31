@@ -5,11 +5,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.*;
 import ru.practicum.shareit.exception.ForbiddenException;
+import ru.practicum.shareit.request.ItemRequest;
+import ru.practicum.shareit.request.ItemRequestRepository;
+import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserRepository;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.StreamSupport;
 
 @Service
@@ -20,6 +24,7 @@ public class ItemServiceImpl implements ItemService {
     private final ItemRepository itemRepository;
     private final BookingRepository bookingRepository;
     private final CommentRepository commentRepository;
+    private final ItemRequestRepository itemRequestRepository;
 
     @Override
     public List<ItemOwnerDto> findAllByOwnerId(long ownerId) {
@@ -27,7 +32,7 @@ public class ItemServiceImpl implements ItemService {
         return itemRepository.findAllByOwnerId(ownerId).stream()
                 .map(i -> {
                     List<Booking> itemBookings = StreamSupport.stream(bookings.spliterator(), false)
-                            .filter(b -> b.getItem().getId() == i.getId()).toList();
+                            .filter(b -> Objects.equals(b.getItem().getId(), i.getId())).toList();
                     Booking lastBooking = itemBookings.stream()
                             .filter(b -> b.getStart().isBefore(LocalDateTime.now())).findFirst().orElse(null);
                     Booking nextBooking = itemBookings.reversed().stream()
@@ -61,8 +66,10 @@ public class ItemServiceImpl implements ItemService {
     @Override
     @Transactional
     public ItemDto create(long userId, ItemDto itemDto) {
-        Item item = ItemMapper.mapToItem(userRepository.findById(userId).orElseThrow(), itemDto);
-        return ItemMapper.mapToItemDto(itemRepository.save(item));
+        User user = userRepository.findById(userId).orElseThrow();
+        ItemRequest itemRequest = itemDto.getRequestId() != null ?
+                itemRequestRepository.findById(itemDto.getRequestId()).orElseThrow() : null;
+        return ItemMapper.mapToItemDto(itemRepository.save(ItemMapper.mapToItem(user, itemDto, itemRequest)));
     }
 
     @Override

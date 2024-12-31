@@ -2,6 +2,7 @@ package ru.practicum.shareit.item;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import ru.practicum.shareit.request.ItemRequest;
 import ru.practicum.shareit.user.User;
 
 import java.time.LocalDateTime;
@@ -14,18 +15,19 @@ public final class ItemMapper {
                 item.getId(),
                 item.getName(),
                 item.getDescription(),
-                item.getAvailable()
+                item.getAvailable(),
+                item.getRequest() != null ? item.getRequest().getId() : null
         );
     }
 
-    public static Item mapToItem(User user, ItemDto itemDto) {
+    public static Item mapToItem(User user, ItemDto itemDto, ItemRequest itemRequest) {
         return new Item(
                 itemDto.getId(),
                 itemDto.getName(),
                 itemDto.getDescription(),
                 itemDto.getAvailable(),
                 user,
-                null
+                itemRequest
         );
     }
 

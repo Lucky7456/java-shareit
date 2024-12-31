@@ -16,7 +16,7 @@ import ru.practicum.shareit.user.User;
 public class Item {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     @Column
     private String name;
@@ -32,7 +32,7 @@ public class Item {
     @ToString.Exclude
     private User owner;
 
-    @OneToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "request_id")
     @ToString.Exclude
     private ItemRequest request;
