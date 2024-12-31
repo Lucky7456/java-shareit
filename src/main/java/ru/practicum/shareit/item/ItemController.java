@@ -26,17 +26,24 @@ public class ItemController {
     }
 
     @GetMapping("/{itemId}")
-    public ItemDto getItem(@PathVariable long itemId) {
+    public ItemOwnerDto getItemById(@PathVariable long itemId) {
         return service.getItemById(itemId);
     }
 
     @GetMapping
-    public List<ItemDto> findAllUserItems(@RequestHeader("X-Sharer-User-Id") long userId) {
-        return service.findAllUserItems(userId);
+    public List<ItemOwnerDto> findAllByOwnerId(@RequestHeader("X-Sharer-User-Id") long ownerId) {
+        return service.findAllByOwnerId(ownerId);
     }
 
     @GetMapping("/search")
     public List<ItemDto> searchItems(@RequestParam String text) {
         return service.searchItemsBy(text);
+    }
+
+    @PostMapping("/{itemId}/comment")
+    public CommentDto createComment(@RequestHeader("X-Sharer-User-Id") long bookerId,
+                                    @PathVariable long itemId,
+                                    @Valid @RequestBody CommentDto comment) {
+        return service.createComment(bookerId, itemId, comment);
     }
 }
