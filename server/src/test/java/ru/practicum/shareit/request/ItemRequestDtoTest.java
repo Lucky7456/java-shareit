@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.json.JsonTest;
 import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.json.JsonContent;
-import ru.practicum.shareit.item.ItemDto;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -20,7 +19,7 @@ public class ItemRequestDtoTest {
 
     @Test
     void itemRequestDtoTest() throws IOException {
-        LocalDateTime start = LocalDateTime.now().truncatedTo(ChronoUnit.MICROS);
+        LocalDateTime start = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
         JsonContent<ItemRequestDto> json = tester.write(new ItemRequestDto(1L, "item", 1L, start, null));
 
         assertThat(json).extractingJsonPathNumberValue("$.id").isEqualTo(1);
