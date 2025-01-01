@@ -15,7 +15,6 @@ import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserRepository;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.StreamSupport;
@@ -45,7 +44,8 @@ public class ItemServiceImpl implements ItemService {
                             i,
                             lastBooking != null ? lastBooking.getStart() : null,
                             nextBooking != null ? nextBooking.getStart() : null,
-                            commentRepository.findByItemId(i.getId()).stream().map(CommentMapper::toDto).toList()
+                            StreamSupport.stream(commentRepository.findAll(QComment.comment.item.id.eq(i.getId()))
+                                    .spliterator(), false).map(CommentMapper::toDto).toList()
                     );
                 })
                 .toList();
@@ -53,9 +53,6 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<ItemDto> searchItemsBy(String text) {
-        if (text.isBlank()) {
-            return Collections.emptyList();
-        }
         return itemRepository.findAllByText(text).stream()
                 .map(ItemMapper::mapToItemDto)
                 .toList();
@@ -63,8 +60,11 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemOwnerDto getItemById(long itemId) {
-        return ItemMapper.mapToItemOwnerDto(itemRepository.findById(itemId).orElseThrow(), null,
-                null, commentRepository.findByItemId(itemId).stream().map(CommentMapper::toDto).toList());
+        Item item = itemRepository.findById(itemId).orElseThrow();
+        List<CommentDto> comments = StreamSupport
+                .stream(commentRepository.findAll(QComment.comment.item.id.eq(itemId)).spliterator(), false)
+                .map(CommentMapper::toDto).toList();
+        return ItemMapper.mapToItemOwnerDto(item, null, null, comments);
     }
 
     @Override

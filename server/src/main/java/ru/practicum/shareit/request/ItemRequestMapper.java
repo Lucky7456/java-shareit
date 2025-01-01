@@ -16,7 +16,7 @@ public final class ItemRequestMapper {
                 itemRequestDto.getId(),
                 itemRequestDto.getDescription(),
                 user,
-                LocalDateTime.now()
+                itemRequestDto.getCreated() == null ? LocalDateTime.now() : itemRequestDto.getCreated()
         );
     }
 

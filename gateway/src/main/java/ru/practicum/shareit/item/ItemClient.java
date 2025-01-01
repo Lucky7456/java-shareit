@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import ru.practicum.shareit.client.BaseClient;
 
+import java.util.Collections;
 import java.util.Map;
 
 @Service
@@ -42,6 +43,9 @@ public class ItemClient extends BaseClient {
     }
 
     public ResponseEntity<Object> searchItems(String text) {
+        if (text.isBlank()) {
+            return ResponseEntity.ok(Collections.emptyList());
+        }
         return get("/search?text={text}", null, Map.of("text", text));
     }
 
